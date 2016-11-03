@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>年份选择滚动效果</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+	<style type="text/css">
+		*{padding: 0;margin: 0;font-size: 14px}
+		.years-nav{
+			border-bottom:1px solid blue;
+    		overflow:hidden;
+		}
+		a{text-decoration: none;}
+		.years{
+			width: 100%;
+			position:relative;
+        	margin:0;
+        	float: left;
+		}
+		.year-item{
+			float: left;
+			width: 33.3%;
+			list-style: none;
+			text-align: center;
+		}
+		.year{
+			display:block;
+            text-align:center;
+            height:40px;
+            line-height:40px;
+            font-size:125%;
+		}
+		.year-item .curYear{
+            color:red ;
+            font-size:23px ;
+        }
+	</style>
+	<script src="http://cdn.static.runoob.com/libs/jquery/1.10.2/jquery.min.js">
+	</script>
+</head>
+<body>
+	<div class="years-nav">
+        <ul class="years">
+            <li class="year-item">
+                <a href="javascript:void(0)" class="year" id="2014"></a>
+            </li>
+            <li class="year-item">
+                <a href="javascript:void(0)" class="year" id="2015"></a>
+            </li>
+            <li class="year-item">
+                <a href="javascript:void(0)" class="year curYear"></a>
+            </li>
+        </ul>
+    </div>
+</body>
+<script type="text/javascript">
+	$(document).ready(function(){
+		var initCurYear = new Date().getFullYear();
+		var years = null;
+	    var maxYear = null;
+	    var curYear = null;
+	    var nextYear = null;
+	    var allYears = [];
+	    var offsetLength = 0;
+	    var mask = null;
+		years = $(".years");
+        maxYear = new Date().getFullYear();
+        curYear = maxYear;
+        allYears.push(curYear - 2);
+        allYears.push(curYear - 1);
+        allYears.push(curYear);
+        offsetLength = years.width() / 3;
+        $(".years li:nth-child(1)").children("a").html(parseInt(initCurYear)-2);
+        $(".years li:nth-child(1)").children("a").attr("id",parseInt(initCurYear)-2);
+        $(".years li:nth-child(2)").children("a").html(parseInt(initCurYear)-1);
+        $(".years li:nth-child(2)").children("a").attr("id",parseInt(initCurYear)-1);
+        $(".years li:nth-child(3)").children("a").html(initCurYear);
+        $(".years li:nth-child(3)").children("a").attr("id",initCurYear);
+        years.on("click", function(e) {
+            var target = e.target;
+            if (e.target.nodeName.toLowerCase() == "a") {
+               $("#"+target.getAttribute("id")).addClass("curYear");
+               $("#"+target.getAttribute("id")).parent().siblings("li").children("a").removeClass("curYear");//移除其他年份的样式
+                nextYear = target.getAttribute("id");
+                if (checkYear()) {
+                    queryDetails({
+                        "year": nextYear,
+                        "type": "1",
+                        "wxId":"2"
+                    });
+                    scrollNav();
+                }
+            }
+        });
+        years.children(".year-item").width(offsetLength);
+	var checkYear = function() {
+        return nextYear == curYear ? false : true;
+    };
+    var scrollNav = function() {
+        if (nextYear == maxYear) {
+            resetYear(curYear,nextYear);
+            return;
+        }
+        if (nextYear < curYear && parseInt(nextYear) + 1 == maxYear) {
+            resetYear(curYear,nextYear);
+            return;
+        }
+        var scorllLen = offsetLength;
+        if (curYear < nextYear) {
+            scorllLen = -scorllLen;
+        }
+        handleScroll(parseFloat(years.css("margin-left")) + scorllLen);
+    };
+    var handleScroll = function(len) {
+        years.animate({
+            "marginLeft": len + "px"
+        }, function() {
+            addYear(len);
+            resetYear();
+        });
+    };
+    var resetYear = function() {
+        curYear = nextYear;
+    };
+    var addYear = function(len) {
+        var minYear = allYears[0];
+        if (nextYear == minYear) {
+            var addYear = parseInt(nextYear - 1);
+            allYears.unshift(addYear);
+            addYearDom = $("<li class='year-item addAppear' style='width:" + offsetLength + "px'><a href='#' class='year' id='" + addYear + "'>" + addYear + "</a></li>");
+            years.prepend(addYearDom);
+            years.width(allYears.length * offsetLength).css({
+                "margin-left": (len - offsetLength) + "px"
+            });
+            return true;
+        } else {
+            return false;
+        }
+    };
+	});
+	function queryDetails(param){
+		successCallBack(param);
+	}
+	function successCallBack(param){
+		console.log(param);
+	}
+
+	function failCallBack(){
+
+	}
+</script>
+</html>
