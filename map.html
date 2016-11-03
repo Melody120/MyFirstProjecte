@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>百度地图</title>
+	<meta charset="utf-8" />
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=HFuznBO1oPz4vqf1rSYDkNrG"></script>
+	<style type="text/css">
+	.local-map {
+	    width: 850px;
+	    height: 500px;
+	}
+	</style>
+</head>
+<body>
+<div class="local-map" id="local-map">
+</div>
+</body>
+<script type="text/javascript">
+	$(function(){
+		var map = new BMap.Map("local-map");  
+		var point = new BMap.Point(114.350525, 30.560837); 
+		map.centerAndZoom(point, 18); 
+		map.enableScrollWheelZoom();
+		var local = new BMap.LocalSearch(map, {
+				renderOptions: {map: map, panel: "r-result"}
+			});
+		local.search('汉街总部国际b座');
+	});
+</script>
+</html>
